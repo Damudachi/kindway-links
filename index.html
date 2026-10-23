@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex" />
+    <title>Kindway</title>
+    <style>
+      :root {
+        --paper: #f1efea;
+        --ink: #25272b;
+        --ink-muted: #55575b;
+        --on-ink: #f8f7f3;
+        --trail: #4d6474;
+        --sand: #cfc8bb;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--paper);
+        color: var(--ink);
+        font: 16px/1.5 Roboto, system-ui, -apple-system, 'Segoe UI', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+      }
+      main { width: 100%; max-width: 420px; }
+      .mark { font-family: Georgia, 'Times New Roman', serif; font-size: 20px; color: var(--trail); margin: 0 0 32px; }
+      h1 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; font-size: 28px; line-height: 1.25; margin: 0 0 12px; }
+      p { margin: 0 0 16px; color: var(--ink-muted); }
+      .button {
+        display: block;
+        text-align: center;
+        min-height: 52px;
+        padding: 14px 20px;
+        border-radius: 999px;
+        background: var(--ink);
+        color: var(--on-ink);
+        font-weight: 500;
+        text-decoration: none;
+        margin: 24px 0 16px;
+      }
+      .small { font-size: 14px; border-top: 1px solid var(--sand); padding-top: 16px; }
+      [hidden] { display: none; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="mark">Kindway</p>
+      <h1 id="title">One moment…</h1>
+      <p id="body"></p>
+      <a id="open" class="button" hidden>Open Kindway</a>
+      <p id="note" class="small" hidden></p>
+      <noscript><p>Your email is confirmed. Go back to Kindway on your phone and sign in.</p></noscript>
+    </main>
+    <script src="link.js"></script>
+    <script>
+      (function () {
+        var result = KindwayLink.decide(location.href, navigator.userAgent);
+        // The code has done its job once read; keep it out of history and screenshots.
+        history.replaceState(null, '', location.pathname);
+        var reset = result.purpose === 'reset';
+        var copy = {
+          open: reset
+            ? ['Choose a new password', 'Open Kindway to choose your new password.']
+            : ['Email confirmed', 'Open Kindway to finish signing in.'],
+          error: reset
+            ? ['This link has expired', 'It may be old or already used. Ask for a new one from the Kindway sign-in screen.']
+            : ['This link has expired', 'It may be old or already used. If you confirmed before, your email is confirmed: just sign in to Kindway.'],
+          done: reset
+            ? ['Open this on your phone', 'Password links only work on the phone where you use Kindway. Open the email there.']
+            : ['Email confirmed', 'Go back to Kindway on your phone and sign in.'],
+        }[result.kind];
+        document.getElementById('title').textContent = copy[0];
+        document.getElementById('body').textContent = copy[1];
+        if (result.kind !== 'open') return;
+        var open = document.getElementById('open');
+        open.href = result.url;
+        open.hidden = false;
+        var note = document.getElementById('note');
+        note.textContent = 'If nothing happens, check that Kindway is installed on this phone, or go back to the app and sign in.';
+        note.hidden = false;
+        // Browsers may block opening an app without a tap; the button is there for that.
+        location.href = result.url;
+      })();
+    </script>
+  </body>
+</html>
